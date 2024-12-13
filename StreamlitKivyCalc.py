@@ -79,11 +79,12 @@ if st.button("Calcular"):
 
     # Gráfico de barras
     st.subheader("Comparativo de Rentabilidade")
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(10, 5))
     investimentos = [r[0] for r in resultados]
     rentabilidades = [r[2] for r in resultados]
     ax.bar(investimentos, rentabilidades, color="#6200ea")
     ax.set_ylabel("Rentabilidade Líquida (%)")
     ax.set_xlabel("Investimentos")
     ax.set_title("Rentabilidade por Tipo de Investimento")
+    plt.xticks(rotation=45, ha="right")  # Melhora a legibilidade dos rótulos no eixo X
     st.pyplot(fig)
