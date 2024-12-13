@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
+import plotly.express as px
 import base64
 from io import BytesIO
 
@@ -61,7 +61,10 @@ def download_link(object_to_download, download_filename, download_link_text):
 
 # Interface com Streamlit
 st.title("Calculadora de Investimentos")
-st.markdown("<style>.stButton>button {background-color: #6200ea; color: white; border-radius: 5px;} </style>", unsafe_allow_html=True)
+st.markdown(
+    "<style>.stButton>button {background-color: #6200ea; color: white; border-radius: 5px;} body {background-color: #f9f9f9;}</style>",
+    unsafe_allow_html=True
+)
 
 # Entradas do usuário
 investimento_inicial = st.number_input("Investimento Inicial (R$):", value=10000.0, format="%.2f")
@@ -95,17 +98,24 @@ if st.button("Calcular"):
         f"### Melhor investimento: **{melhor_investimento[0]}** com rentabilidade líquida de **{melhor_investimento[2]:.2f}%**"
     )
 
-    # Gráfico de barras
+    # Gráfico de barras interativo
     st.subheader("Comparativo de Rentabilidade")
-    fig, ax = plt.subplots(figsize=(10, 5))
-    investimentos = [r[0] for r in resultados]
-    rentabilidades = [r[2] for r in resultados]
-    ax.bar(investimentos, rentabilidades, color="#6200ea")
-    ax.set_ylabel("Rentabilidade Líquida (%)")
-    ax.set_xlabel("Investimentos")
-    ax.set_title("Rentabilidade por Tipo de Investimento")
-    plt.xticks(rotation=45, ha="right")
-    st.pyplot(fig)
+    df_chart = pd.DataFrame(
+        {
+            "Investimentos": [r[0] for r in resultados],
+            "Rentabilidade Líquida (%)": [r[2] for r in resultados],
+        }
+    )
+    fig = px.bar(
+        df_chart,
+        x="Investimentos",
+        y="Rentabilidade Líquida (%)",
+        color="Investimentos",
+        title="Rentabilidade por Tipo de Investimento",
+        text_auto=True,
+    )
+    fig.update_layout(xaxis_tickangle=-45)
+    st.plotly_chart(fig)
 
     # Exportar resultados
     csv_link = download_link(df_resultados, "resultados_investimentos.csv", "Baixar Resultados em CSV")
